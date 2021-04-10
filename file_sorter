@@ -1,7 +1,7 @@
 import os, time, platform, glob, shutil
 from datetime import datetime
 
-paths = ['C:\\Users\\antoa\\Downloads\\', '\\Users\\antoa\\Pictures\\' ]
+paths = ['\\Downloads\\', '\\Pictures\\' ] #insert your file paths you want to sort here.
 for path in paths:
     os.chdir(path)
     directory_list = os.listdir(path)
