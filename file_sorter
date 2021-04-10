@@ -1,0 +1,50 @@
+import os, time, platform, glob, shutil
+from datetime import datetime
+
+paths = ['C:\\Users\\antoa\\Downloads\\', '\\Users\\antoa\\Pictures\\' ]
+for path in paths:
+    os.chdir(path)
+    directory_list = os.listdir(path)
+    files_list     = glob.glob('*.*')
+
+    # garners a list of folders/directories in the cwd
+    # garners a list of the first word in the file names for future sorting
+    # of that list of first words, creates a set of new, if not already created, directories
+    # grabs a current date timestamp for future use in file renaming
+
+    current_directories   = [folder for folder in directory_list if os.path.isdir(folder)]
+    file_names_first_word = [file_name.split(' ') for file_name in files_list]
+    future_folder_name    = set([future_folder_names[0] for future_folder_names in file_names_first_word])
+    Current_Date = datetime.today().strftime('%d-%b-%Y')
+
+    def createDirs():
+        '''
+        takes from the previously collected set of new folder names, check if they exist already, if not, creates them
+        '''
+        for new_directory in future_folder_name:
+            if not os.path.exists(new_directory):
+                os.makedirs(new_directory.lower())
+
+
+    def arrange():
+        '''loops through current files in the path,
+        nests a directory loop to check possible directories that match the file name
+        if it matches sort into it.
+                    '''
+
+        for file_name in files_list:
+            for directory in current_directories:
+                if directory in file_name and 'ini' not in file_name:
+                    new_full_path = os.path.join(path+directory, file_name)
+                    new_working_directory = os.path.join(path, directory)
+                    #creates compatibility for a full path between windows and linux slashes
+                    shutil.move(path+file_name, new_full_path)
+                    #the actual moving of the file
+                    os.chdir(new_working_directory)
+                    #changes the cwd to tidy up the arguments in the os.rename
+                    os.rename(file_name, Current_Date+' '+file_name)
+                    #renames the file with a timestamp at the beginning
+
+    createDirs()
+    arrange()
+    #time.sleep(15)
