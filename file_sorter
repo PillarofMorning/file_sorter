@@ -1,50 +1,37 @@
-import os, time, platform, glob, shutil
+import os
+import glob
 from datetime import datetime
 
-paths = ['\\Downloads\\', '\\Pictures\\' ] #insert your file paths you want to sort here.
-for path in paths:
-    os.chdir(path)
-    directory_list = os.listdir(path)
-    files_list     = glob.glob('*.*')
+path = os.getcwd() #this is meant to be combined with right click functionality,otherwise put desired path
+os.chdir(path)
+directory_list = os.listdir(path)
+files_list = glob.glob('*.*')
 
-    # garners a list of folders/directories in the cwd
-    # garners a list of the first word in the file names for future sorting
-    # of that list of first words, creates a set of new, if not already created, directories
-    # grabs a current date timestamp for future use in file renaming
+current_directories = [folder for folder in directory_list if os.path.isdir(folder)]
+file_names_first_word = [file_name.split(' ') for file_name in files_list]
+future_folder_name = set([future_folder_names[0] for future_folder_names in file_names_first_word])
+Current_Date = datetime.today().strftime('%d-%b-%Y')
 
-    current_directories   = [folder for folder in directory_list if os.path.isdir(folder)]
-    file_names_first_word = [file_name.split(' ') for file_name in files_list]
-    future_folder_name    = set([future_folder_names[0] for future_folder_names in file_names_first_word])
-    Current_Date = datetime.today().strftime('%d-%b-%Y')
-
-    def createDirs():
-        '''
-        takes from the previously collected set of new folder names, check if they exist already, if not, creates them
-        '''
-        for new_directory in future_folder_name:
-            if not os.path.exists(new_directory):
-                os.makedirs(new_directory.lower())
+def createDirs():
+    '''takes from the previously collected set of new folder names, check if they exist already, if not, creates them'''
+    for new_directory in future_folder_name:
+        if not os.path.exists(new_directory):
+            os.makedirs(new_directory.lower())
 
 
-    def arrange():
-        '''loops through current files in the path,
-        nests a directory loop to check possible directories that match the file name
-        if it matches sort into it.
-                    '''
+def arrange():
+    '''loops through current files in the path,
+    nests a directory loop to check possible directories that match the file name
+    if it matches sort into it.'''
+    for file_name in files_list:
+        key = file_name.split(' ')
+        if key[0] in current_directories and 'ini' not in key:
+            old_full_path = os.path.join(path, file_name)
+            new_full_path = os.path.join(path, key[0], file_name) #creates compatibility for a full path between windows and linux slashes
+            os.rename(old_full_path, new_full_path) #the actual moving of the file
+            os.chdir(os.path.join(path, key[0]))
+            os.rename(new_full_path, Current_Date + ' ' + file_name)  # renames the file with a timestamp at the beginning
 
-        for file_name in files_list:
-            for directory in current_directories:
-                if directory in file_name and 'ini' not in file_name:
-                    new_full_path = os.path.join(path+directory, file_name)
-                    new_working_directory = os.path.join(path, directory)
-                    #creates compatibility for a full path between windows and linux slashes
-                    shutil.move(path+file_name, new_full_path)
-                    #the actual moving of the file
-                    os.chdir(new_working_directory)
-                    #changes the cwd to tidy up the arguments in the os.rename
-                    os.rename(file_name, Current_Date+' '+file_name)
-                    #renames the file with a timestamp at the beginning
+createDirs()
+arrange()
 
-    createDirs()
-    arrange()
-    #time.sleep(15)
