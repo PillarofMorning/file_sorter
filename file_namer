@@ -1,0 +1,17 @@
+import os
+import sys
+import tkinter as tk
+from tkinter import simpledialog
+
+
+ROOT = tk.Tk()
+ROOT.withdraw()
+USER_INP = simpledialog.askstring(title="prefix",
+                                  prompt="What's your desired prefix?:")
+
+full_path = sys.argv[1]
+
+end_of_fp = full_path.split('\\')
+end_of_fp = end_of_fp[-1].split(' ')
+
+os.rename(full_path, str(USER_INP) + ' ' + end_of_fp[-1])
